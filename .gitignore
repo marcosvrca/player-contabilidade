@@ -1,0 +1,10 @@
+# Backend e frontend são repositórios Git separados (clone manual; sem submodules)
+gerenciamento-obrigacoes-backend/
+gerenciamento-obrigacoes-frontend/
+
+# IDE / local
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
