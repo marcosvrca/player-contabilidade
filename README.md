@@ -44,6 +44,20 @@ git clone https://github.com/marcosvrca/gerenciamento-obrigacoes-frontend.git
 - **Frontend:** Flutter / Dart 3, Riverpod, Dio, Material (`material_ui`), file_picker / path_provider / open_filex  
 - **Qualidade:** GitHub Actions (Maven verify / Flutter analyze + test)
 
+## Pré-requisitos (ambiente completo)
+
+| Ferramenta | Versão / nota |
+|------------|----------------|
+| **Git** | Para clonar os três repositórios |
+| **Docker Desktop** | Instalado e **em execução** (daemon ativo) antes do `docker compose` |
+| **Flutter SDK** | **3.50+** (stable), Dart **3.11+**, no `PATH` — confira com `flutter --version` |
+| **Chrome** (ou Edge) | Para `flutter run -d chrome` |
+| **JDK 21** | Só se for rodar a API **fora** do Docker (`mvnw spring-boot:run`) |
+
+**Windows (Flutter):** ative o [Developer Mode](ms-settings:developers) (Configurações → Sistema → Para desenvolvedores). Sem isso, `flutter pub get` / plugins podem falhar por falta de suporte a symlinks.
+
+**Windows (atalho):** `start-frontend.cmd` usa o `flutter` do `PATH` — não depende de caminho fixo de máquina.
+
 ## Arquitetura lógica
 
 ```
@@ -61,6 +75,8 @@ git clone https://github.com/marcosvrca/gerenciamento-obrigacoes-frontend.git
 
 ## Execução rápida (ambiente completo)
 
+Com os três repositórios na mesma pasta e o Docker Desktop **aberto**:
+
 ### 1. Backend (API + MySQL)
 
 ```bash
@@ -68,20 +84,37 @@ cd gerenciamento-obrigacoes-backend
 docker compose up --build
 ```
 
+Aguarde o MySQL ficar healthy e a API subir (primeira build pode demorar).
+
 - API: http://localhost:8080  
 - Swagger: http://localhost:8080/swagger-ui.html  
 - MySQL: `localhost:3306` (usuário/senha `obrigacoes`)
 
-Seed opcional de demo (após containers saudáveis), no Windows:
+Se aparecer erro de nome de container já em uso (`obrigacoes-mysql` / `obrigacoes-api`), remova os antigos e suba de novo:
+
+```bash
+docker rm -f obrigacoes-mysql obrigacoes-api
+docker compose up --build
+```
+
+Seed opcional de demo (após containers saudáveis):
 
 ```powershell
+# Windows
 cd gerenciamento-obrigacoes-backend
 .\scripts\seed-demo-data.ps1
 ```
 
+```bash
+# Linux / macOS
+cd gerenciamento-obrigacoes-backend
+chmod +x ./scripts/seed-demo-data.sh
+./scripts/seed-demo-data.sh
+```
+
 ### 2. Frontend
 
-Com a API em `http://localhost:8080`:
+Com a API em `http://localhost:8080` e Flutter **3.50+** no `PATH`:
 
 ```bash
 cd gerenciamento-obrigacoes-frontend
@@ -91,7 +124,7 @@ flutter run -d chrome
 flutter run -d web-server --web-hostname 127.0.0.1 --web-port 5000
 ```
 
-No Windows, também: `start-frontend.cmd` (na raiz deste monorepo).
+No Windows, também: `start-frontend.cmd` (na raiz deste monorepo; exige `flutter` no `PATH`).
 
 ## Configuração do ambiente (resumo)
 
@@ -126,7 +159,7 @@ player-contabilidade/
 
 - Camadas Controller → Service → Repository; validação Bean Validation; Flyway com `ddl-auto=validate`.  
 - UTF-8 forçado em servlet + JDBC utf8mb4; migration `V5` converte schema/colunas.  
-- Seed demo via SQL + script PowerShell que usa `docker cp` (evita corrupção de acentos no pipe do Windows).
+- Seed demo via SQL + scripts PowerShell/Bash que usam `docker cp` (evita corrupção de acentos no pipe do shell).
 
 ### Frontend (incluindo decisões recentes)
 
